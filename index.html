@@ -95,7 +95,7 @@
             const popupRoot = document.getElementById('popup-root');
 
             const apiClient = {
-                baseUrl: 'https://17d113bb75b6.ngrok-free.app/api',
+                baseUrl: 'https://astro-python-tutor-backend.vercel.app/api',
                 apiKey: 'AIzaSyBKw4s0DE1OFLCvJjI00OxviuTWVn14pfw', 
 
                 async fetchWithTimeout(url, options = {}, timeout = 30000) {
@@ -166,7 +166,7 @@
                         <p class="text-slate-300">${message}</p>
                         <ul class="list-disc list-inside text-slate-400 mt-2 space-y-1">
                             <li>Is your Python Flask server running?</li>
-                            <li>Is the ngrok URL correct?</li>
+                            <li>Is the URL correct?</li>
                         </ul>
                         <p class="text-xs text-slate-500 mt-4">Details: ${details}</p>
                         <button id="reset-btn" class="mt-6 w-full px-6 py-2 bg-neon-purple/80 text-white font-bold rounded-lg transition-colors hover:bg-neon-purple">Try Again</button>
