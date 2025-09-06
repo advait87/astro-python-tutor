@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Python Learning Module</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#000000',
+                        'bento-base': '#111111',
+                        'bento-contrast': '#222222',
+                        'neon-cyan': '#00e0e0',
+                        'neon-purple': '#a855f7',
+                        'neon-blue': '#00a0ff',
+                        'neon-green': '#00ff00',
+                    },
+                    animation: {
+                        'gradient-x': 'gradient-x 5s ease infinite',
+                    },
+                    keyframes: {
+                        'gradient-x': {
+                            '0%, 100%': { 'background-position': '0% 50%' },
+                            '50%': { 'background-position': '100% 50%' },
+                        },
+                    },
+                },
+            },
+        };
+    </script>
+
+    <style type="text/tailwindcss">
+        @layer base {
+            body { 
+                @apply bg-background text-slate-200 font-sans; 
+            }
+        }
+        .bento-box { 
+            @apply bg-bento-base border border-bento-contrast rounded-xl p-6 sm:p-8; 
+        }
+        .neon-text {
+             @apply bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-blue text-transparent bg-clip-text;
+             background-size: 200%;
+             animation: gradient-x 5s ease infinite;
+        }
+        .prose { @apply text-slate-300; }
+        .prose h3 {
+            @apply text-2xl font-bold mt-8 mb-3 bg-gradient-to-r from-neon-cyan via-neon-purple to-neon-blue text-transparent bg-clip-text;
+            background-size: 200%;
+            animation: gradient-x 5s ease infinite;
+        }
+        .prose h4 { @apply text-lg font-bold text-slate-200; }
+        .prose p, .prose ul { @apply mb-4 leading-relaxed; }
+        .prose ul { @apply list-disc pl-5; }
+        .prose li { @apply mb-2; }
+        .prose code { @apply text-neon-cyan bg-bento-contrast font-mono text-sm p-1 rounded-md; }
+        .prose pre { @apply bg-bento-contrast border border-slate-800 rounded-lg p-4 my-6 overflow-x-auto; }
+        .prose pre code { @apply bg-transparent p-0 text-white; }
+        .prose strong { @apply text-slate-100; }
+        .prose a { @apply text-neon-blue no-underline transition-colors hover:text-neon-cyan; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #111111; }
+        ::-webkit-scrollbar-thumb { background-color: #222222; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background-color: #a855f7; }
+        * { scrollbar-width: thin; scrollbar-color: #a855f7 #111111; }
+    </style>
+</head>
+
+<body class="w-full min-h-screen flex flex-col items-center justify-center p-4">
+
+    <main class="w-full max-w-4xl mx-auto">
+        <div id="header" class="text-center mb-8">
+            <h1 class="text-4xl sm:text-5xl font-bold neon-text">Learning Module</h1>
+            <p class="text-slate-400 mt-2">This module is tailored to your assessment results.</p>
+            
+            <div id="loading-container" class="mt-6 w-full max-w-md mx-auto h-24 bg-bento-contrast rounded-lg overflow-hidden">
+                <canvas id="loading-canvas"></canvas>
+            </div>
+        </div>
+
+        <div id="content-container" class="bento-box prose prose-invert max-w-none transition-opacity duration-500 opacity-0 min-h-[200px]">
+            </div>
+
+        <div id="nextButtonContainer" class="flex justify-center mt-8 hidden">
+            <button 
+                onclick="window.location.href='./task.html'"
+                class="bg-neon-purple text-white font-bold py-3 px-8 rounded-lg shadow-lg shadow-neon-purple/20 hover:bg-neon-blue hover:shadow-neon-blue/30 transition-all duration-300 transform hover:scale-105"
+            >
+                Start Task
+            </button>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const contentContainer = document.getElementById('content-container');
+            const loadingContainer = document.getElementById('loading-container');
+            const nextButtonContainer = document.getElementById('nextButtonContainer');
+            const apiUrl = 'https://17d113bb75b6.ngrok-free.app/api/getModuleExplanation';
+            
+            // --- Canvas Code Rain Animation ---
+            const canvas = document.getElementById('loading-canvas');
+            const ctx = canvas.getContext('2d');
+            let animationFrameId;
+
+            const setupCanvas = () => {
+                const dpr = window.devicePixelRatio || 1;
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width * dpr;
+                canvas.height = rect.height * dpr;
+                ctx.scale(dpr, dpr);
+            };
+
+            setupCanvas();
+            
+            const characters = '01';
+            const fontSize = 14;
+            const columns = canvas.width / fontSize;
+            const drops = Array.from({ length: columns }).fill(1);
+            
+            function draw() {
+                ctx.fillStyle = 'rgba(17, 17, 17, 0.05)'; // transparent bento-base
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = '#00e0e0'; // neon-cyan
+                ctx.font = `${fontSize}px monospace`;
+
+                for(let i = 0; i < drops.length; i++) {
+                    const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                    
+                    if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        drops[i] = 0;
+                    }
+                    drops[i]++;
+                }
+                animationFrameId = requestAnimationFrame(draw);
+            }
+
+            // --- Main Content Loading Logic ---
+            async function loadContent() {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+                draw(); // Start the code rain
+
+                try {
+                    const response = await fetch(apiUrl, { method: 'POST', signal: controller.signal });
+                    clearTimeout(timeoutId);
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const htmlContent = await response.text();
+                    
+                    contentContainer.innerHTML = htmlContent;
+                    nextButtonContainer.classList.remove('hidden');
+                    
+                } catch (error) {
+                    clearTimeout(timeoutId);
+                    console.error("Failed to fetch content:", error);
+                    let errorMessage = "Sorry, we couldn't load the content. Please try again later.";
+                    if (error.name === 'AbortError') {
+                        errorMessage = "The request timed out. Please check your connection and try again.";
+                    }
+                    contentContainer.innerHTML = `<p class="text-red-500 text-center">${errorMessage}</p>`;
+                } finally {
+                    // Stop animation, hide the loader, and show the content
+                    cancelAnimationFrame(animationFrameId);
+                    loadingContainer.style.display = 'none';
+                    contentContainer.classList.remove('opacity-0');
+                }
+            }
+            loadContent();
+        });
+    </script>
+
+</body>
+
+</html>
