@@ -1,4 +1,4 @@
-# Personalized Micro-Learning Engine
+# Astro Python Tutor
 ##  Problem Statement
 
 Build a personalized, adaptive micro-learning platform for Python programming that improves learning outcomes with minimal learner fatigue.
